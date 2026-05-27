@@ -1,0 +1,32 @@
+body.theme-bg {
+    background: #0f0f0f;
+}
+
+.theme-card {
+    background: #1b1b1b;
+    border: 1px solid #ffcc00;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.theme-card .input,
+.theme-card .textarea,
+.theme-card .select select {
+    border-color: #ffcc00;
+}
+
+.theme-card .label {
+    letter-spacing: 0.3px;
+}
+
+.theme-notice {
+    background: #2a2a2a;
+    color: #fff6bf;
+    border: 1px dashed #ffcc00;
+}
+
+.map-box {
+    margin-top: 12px;
+    height: 320px;
+    border: 2px solid #ffcc00;
+    border-radius: 8px;
+}

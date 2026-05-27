@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE LIFF Register</title>
+    <link rel="stylesheet" href="/assets/css/bulma.min.css">
+    <link rel="stylesheet" href="/assets/css/theme.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <style>
+        .glow {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 6px rgba(255, 204, 0, 0.5); }
+            to { text-shadow: 0 0 16px rgba(255, 204, 0, 0.9); }
+        }
+        .pop {
+            animation: pop 0.8s ease;
+        }
+        .welcome-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .welcome-active .section {
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        .welcome-active .container {
+            padding: 0;
+        }
+        .welcome-active .box.theme-card {
+            margin: 0 1rem;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+
+<body class="theme-bg <?= $showWelcome ? 'welcome-active' : '' ?>">
+<section class="section">
+    <div class="container">
+        <div class="box theme-card">
+            <div class="is-flex is-justify-content-space-between is-align-items-center">
+                <div>
+                    <h1 class="title has-text-warning">ลงทะเบียนร้านค้า</h1>
+                    <p class="subtitle has-text-light">PH.EASY Registration</p>
+                </div>
+                <div class="has-text-centered">
+                    <figure class="image is-48x48 is-inline-block">
+                        <img id="profileImage" src="/assets/img/user-mockup.svg" class="is-rounded" alt="Profile">
+                    </figure>
+                    <p class="has-text-light is-size-7 mt-0" id="profileName">Guest</p>
+                </div>
+            </div>
+
+            <?php if (! empty($errors)) : ?>
+                <div class="notification is-danger">
+                    <ul>
+                        <?php foreach ($errors as $error) : ?>
+                            <li><?= esc($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
+            <form method="post" action="/register/submit" id="registerForm" class="<?= $showWelcome ? 'is-hidden' : '' ?>">
+                <?= csrf_field() ?>
+
+                <div class="field">
+                    <label class="label has-text-warning">ชื่อร้าน</label>
+                    <div class="control">
+                        <input class="input" type="text" name="shop_name" value="<?= old('shop_name') ?>" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label has-text-warning">เบอร์โทรศัพท์ร้าน</label>
+                    <div class="control">
+                        <input class="input" type="tel" name="shop_telephone" value="<?= old('shop_telephone') ?>" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label has-text-warning">ชื่อผู้ติดต่อ</label>
+                    <div class="control">
+                        <input class="input" type="text" name="contact_name" value="<?= old('contact_name') ?>" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="is-flex is-justify-content-space-between is-align-items-center">
+                        <label class="label has-text-warning mb-0">พิกัดร้าน</label>
+                        <p class="has-text-light is-size-7" id="geoPreview">-</p>
+                    </div>
+                    <div class="buttons mt-2">
+                        <button type="button" class="button is-warning is-light" id="autoLocate">ใช้พิกัดปัจจุบัน</button>
+                        <button type="button" class="button is-warning" id="openMap">เลือกตำแหน่งบนแผนที่</button>
+                    </div>
+                    <input type="hidden" id="geoDisplay" name="geo_location" value="<?= old('geo_location') ?>" required>
+                </div>
+
+
+                <div class="modal" id="mapModal">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head theme-card">
+                            <p class="modal-card-title has-text-warning">เลือกตำแหน่งร้าน</p>
+                            <button class="delete" aria-label="close" id="closeMap"></button>
+                        </header>
+                        <section class="modal-card-body theme-card">
+                            <div id="map" class="map-box"></div>
+                        </section>
+                        <footer class="modal-card-foot theme-card">
+                            <button type="button" class="button is-warning" id="confirmMap">ยืนยันตำแหน่ง</button>
+                        </footer>
+                    </div>
+                </div>
+
+                <input type="hidden" name="line_id" id="lineId">
+                <input type="hidden" name="line_display_name" id="lineDisplayName">
+                <input type="hidden" name="is_liff" id="isLiff" value="0">
+
+                <div class="field mt-5">
+                    <div class="control">
+                        <button class="button is-warning is-fullwidth is-medium" type="submit" id="submitBtn">Register</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="notification is-warning is-light is-hidden" id="alreadyRegistered">
+                <p class="has-text-weight-semibold">คุณลงทะเบียนไปแล้ว</p>
+                <p class="is-size-7" id="registeredInfo"></p>
+                <button type="button" class="button is-warning mt-3" id="closeRegistered">ปิด</button>
+            </div>
+
+            <div class="<?= $showWelcome ? '' : 'is-hidden' ?> welcome-screen" id="welcomeSection">
+                <div class="box theme-card has-text-centered pop">
+                    <h1 class="title has-text-warning glow">ยินดีต้อนรับ!</h1>
+                    <p class="subtitle has-text-light"><?= esc($welcomeMessage ?? 'ขอบคุณสำหรับการลงทะเบียน') ?></p>
+                    <div class="notification theme-notice">
+                        <p>Member Code</p>
+                        <p class="is-size-3 has-text-weight-bold has-text-warning glow"><?= esc($memberCode ?? '') ?></p>
+                    </div>
+                    <button class="button is-warning" id="closeLiff">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+<script>
+    const defaultLat = 16.4419;
+    const defaultLng = 102.8350;
+
+    const map = L.map('map').setView([defaultLat, defaultLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+
+    let marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+    const autoLocateBtn = document.getElementById('autoLocate');
+
+    function setGeoStatus(text, type = 'warning') {
+        autoLocateBtn.textContent = text;
+        autoLocateBtn.className = `button is-${type}`;
+        if (type === 'warning') {
+            autoLocateBtn.classList.add('is-light');
+        }
+    }
+
+    function updateGeo(lat, lng) {
+        const value = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+        document.getElementById('geoDisplay').value = value;
+        document.getElementById('geoPreview').textContent = value;
+        setGeoStatus('ได้พิกัดแล้ว', 'success');
+    }
+
+    function setMarker(latlng) {
+        marker.setLatLng(latlng);
+        updateGeo(latlng.lat, latlng.lng);
+    }
+
+    marker.on('dragend', (event) => {
+        const pos = event.target.getLatLng();
+        updateGeo(pos.lat, pos.lng);
+    });
+
+    map.on('click', (event) => setMarker(event.latlng));
+
+    function requestAutoLocate() {
+        if (!navigator.geolocation) {
+            setGeoStatus('ไม่รองรับ GPS', 'danger');
+            return;
+        }
+        setGeoStatus('กำลังดึงพิกัด…', 'warning');
+        navigator.geolocation.getCurrentPosition((position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map.setView([lat, lng], 16);
+            setMarker({ lat, lng });
+        }, () => {
+            setGeoStatus('⟳ ลองอีกครั้ง', 'danger');
+        }, { enableHighAccuracy: true, timeout: 8000 });
+    }
+
+    const mapModal = document.getElementById('mapModal');
+    const openMap = document.getElementById('openMap');
+    const closeMap = document.getElementById('closeMap');
+    const confirmMap = document.getElementById('confirmMap');
+
+    function openMapModal() {
+        mapModal.classList.add('is-active');
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 200);
+    }
+
+    function closeMapModal() {
+        mapModal.classList.remove('is-active');
+    }
+
+    openMap.addEventListener('click', openMapModal);
+    closeMap.addEventListener('click', closeMapModal);
+    mapModal.querySelector('.modal-background').addEventListener('click', closeMapModal);
+    confirmMap.addEventListener('click', closeMapModal);
+
+    document.getElementById('autoLocate').addEventListener('click', requestAutoLocate);
+    window.addEventListener('load', requestAutoLocate);
+
+ 
+
+    let liffReady = false;
+
+    function disableForm() {
+        document.getElementById('registerForm')?.classList.add('is-hidden');
+        document.getElementById('alreadyRegistered')?.classList.remove('is-hidden');
+    }
+
+    function showRegisteredInfo(member) {
+        const info = `Member Code: ${member.member_code} | ร้าน: ${member.shop_name}`;
+        document.getElementById('registeredInfo').textContent = info;
+    }
+
+    async function checkLineDuplicate(lineId) {
+        try {
+            const response = await fetch(`/register/check-line?line_id=${encodeURIComponent(lineId)}`);
+            if (!response.ok) {
+                return false;
+            }
+            const data = await response.json();
+            if (data.exists && data.member) {
+                disableForm();
+                showRegisteredInfo(data.member);
+                return true;
+            }
+        } catch (error) {
+            console.error('Check line duplicate failed', error);
+        }
+        return false;
+    }
+
+    async function initLiff() {
+        const liffId = '2010178930-H6pNBOQl';scrollIntoView
+        if (typeof liff === 'undefined') {
+            return false;
+        }
+        try {
+            await liff.init({ liffId });
+            if (!liff.isLoggedIn()) {
+                if (liff.isInClient()) {
+                    liff.login();
+                    return false;
+                }
+                return false;
+            }
+            const profile = await liff.getProfile();
+            document.getElementById('lineId').value = profile.userId;
+            document.getElementById('lineDisplayName').value = profile.displayName || '';
+            document.getElementById('profileName').textContent = profile.displayName || 'User';
+            if (profile.pictureUrl) {
+                document.getElementById('profileImage').src = profile.pictureUrl;
+            }
+            document.getElementById('isLiff').value = '1';
+            liffReady = true;
+            if (!showWelcome) {
+                await checkLineDuplicate(profile.userId);
+            }
+            return true;
+        } catch (error) {
+            console.error('LIFF init failed', error);
+            return false;
+        }
+    }
+
+    const member = <?= json_encode($member ?? null) ?>;
+    const showWelcome = <?= $showWelcome ? 'true' : 'false' ?>;
+
+    if (showWelcome) {
+        document.getElementById('welcomeSection')?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeApp() {
+        if (typeof liff !== 'undefined' && liff.isInClient()) {
+            liff.closeWindow();
+        } else {
+            window.location.href = '/';
+        }
+    }
+
+    document.getElementById('closeLiff')?.addEventListener('click', closeApp);
+    document.getElementById('closeRegistered')?.addEventListener('click', closeApp);
+
+    async function sendLineMessage() {
+        if (!showWelcome || !member || !member.line_id || typeof liff === 'undefined') {
+            return;
+        }
+        if (!liffReady) {
+            return;
+        }
+        try {
+            if (!liff.isInClient()) {
+                return;
+            }
+            const text = `สมัครสมาชิกสำเร็จ\nMember Code: ${member.member_code}\nร้าน: ${member.shop_name}\nผู้ติดต่อ: ${member.person_name}\nเบอร์โทร: ${member.telephone}`;
+            await liff.sendMessages([{ type: 'text', text }]);
+        } catch (error) {
+            console.error('Send message failed', error);
+        }
+    }
+
+    (async () => {
+        await initLiff();
+        await sendLineMessage();
+    })();
+</script>
+</body>
+</html>
