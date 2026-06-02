@@ -1,0 +1,168 @@
+/* ── Admin Table ──────────────────────────────────────────── */
+.admin-table {
+    background: transparent !important;
+    color: #e0e0e0;
+    font-size: 0.875rem;
+}
+
+.admin-table thead th {
+    color: #ffcc00;
+    border-bottom-color: #ffcc00;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-table tbody tr {
+    background: transparent !important;
+    transition: background 0.2s;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(255, 204, 0, 0.05) !important;
+}
+
+.admin-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.admin-table td {
+    border-bottom-color: #2a2a2a;
+    color: #ccc;
+    vertical-align: middle;
+}
+
+.admin-table td strong {
+    color: #ffcc00;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.admin-table .button.is-small {
+    font-size: 0.75rem;
+    height: 1.8em;
+}
+
+.has-text-nowrap {
+    white-space: nowrap;
+}
+
+/* ── Modal ────────────────────────────────────────────────── */
+.modal-card-foot .button.is-danger {
+    background: #f14668;
+    color: #fff;
+    border: none;
+}
+
+.modal-card-foot .button.is-danger:hover {
+    background: #d9364e;
+}
+
+.modal-card-foot .button {
+    background: #333;
+    color: #ccc;
+    border: 1px solid #444;
+}
+
+.modal-card-foot .button:hover {
+    background: #444;
+    color: #fff;
+}
+
+/* ── Notification overrides ───────────────────────────────── */
+.notification.is-success.is-light {
+    background: rgba(72, 199, 142, 0.15);
+    border: 1px solid #48c78e;
+    color: #b8f0d6;
+}
+
+.notification.is-danger.is-light {
+    background: rgba(241, 70, 104, 0.15);
+    border: 1px solid #f14668;
+    color: #f5b3c1;
+}
+
+/* ── Pagination ──────────────────────────────────────────── */
+.pagination {
+    list-style: none;
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination li a,
+.pagination li span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2em;
+    height: 2em;
+    padding: 0 0.5em;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    color: #ccc;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.pagination li a:hover {
+    background: #3a3a3a;
+    color: #ffcc00;
+    border-color: #ffcc00;
+}
+
+.pagination li.active span {
+    background: #ffcc00;
+    color: #1b1b1b;
+    border-color: #ffcc00;
+    font-weight: 600;
+}
+
+.pagination li.active span:hover {
+    background: #ffcc00;
+    color: #1b1b1b;
+}
+
+/* ── Search Input ─────────────────────────────────────────── */
+.search-input {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+.search-input:focus {
+    border-color: #ffcc00;
+    box-shadow: 0 0 0 0.125em rgba(255, 204, 0, 0.25);
+}
+
+/* ── Select (per page) ────────────────────────────────────── */
+.select select {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #ccc;
+}
+
+.select select:focus {
+    border-color: #ffcc00;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media screen and (max-width: 768px) {
+    .admin-table {
+        font-size: 0.75rem;
+    }
+
+    .admin-table thead th,
+    .admin-table td {
+        padding: 0.4em 0.5em;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        min-width: 1.8em;
+        height: 1.8em;
+        font-size: 0.7rem;
+    }
+}
