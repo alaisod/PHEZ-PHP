@@ -1,2 +1,2 @@
 ## PH.EASY Register
-for event grand opening PH.EASY SHOP
+for event grand opening PH.EASY SHOPx
