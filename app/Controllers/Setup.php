@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Database\Seeds\AdminSeeder;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class Setup extends BaseController
@@ -83,8 +82,7 @@ class Setup extends BaseController
                     $adminExists = $db->table('users')->where('username', 'admin')->countAllResults() > 0;
 
                     if (! $adminExists) {
-                        $seeder = new AdminSeeder();
-                        $seeder->run();
+                        service('seeder')->call('App\Database\Seeds\AdminSeeder');
                     }
                 }
             } catch (\Throwable $e) {
