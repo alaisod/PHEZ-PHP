@@ -73,7 +73,7 @@ class Setup extends BaseController
             }
         }
 
-        // ── Step 3: Seed admin (only if users table exists and admin missing) ──
+        // ── Step 3: Seed admin (insert directly via db) ──
         if (! $hasError) {
             try {
                 $db = db_connect();
@@ -82,7 +82,12 @@ class Setup extends BaseController
                     $adminExists = $db->table('users')->where('username', 'admin')->countAllResults() > 0;
 
                     if (! $adminExists) {
-                        service('seeder')->call('App\Database\Seeds\AdminSeeder');
+                        $db->table('users')->insert([
+                            'username'   => 'admin',
+                            'password'   => password_hash('admin123', PASSWORD_DEFAULT),
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
                     }
                 }
             } catch (\Throwable $e) {
