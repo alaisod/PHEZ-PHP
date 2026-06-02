@@ -66,6 +66,7 @@ class Setup extends BaseController
         // ── Step 2: Run migrations (always — picks up new migration files) ──
         if (! $hasError) {
             try {
+                $migrator = service('migrations');
                 $migrator->latest();
             } catch (\Throwable $e) {
                 $messages[] = '✗ Migrate ล้มเหลว: ' . esc($e->getMessage());
