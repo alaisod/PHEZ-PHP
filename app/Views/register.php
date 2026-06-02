@@ -102,7 +102,7 @@
                     </div>
                 </div>
             </form>
-            <p class="has-text-centered version-label">v1.0.0</p>
+            <p class="has-text-centered version-label">v1.0.1</p>
 
             <div class="notification is-warning is-light is-hidden" id="alreadyRegistered">
                 <p class="has-text-weight-semibold">คุณลงทะเบียนไปแล้ว</p>
