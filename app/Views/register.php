@@ -272,7 +272,7 @@
     }
 
     async function initLiff() {
-        const liffId = '2010178930-H6pNBOQl';scrollIntoView
+        const liffId = '2010178930-H6pNBOQl';
         if (typeof liff === 'undefined') {
             return false;
         }
