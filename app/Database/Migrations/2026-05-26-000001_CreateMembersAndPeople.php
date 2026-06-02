@@ -47,7 +47,7 @@ class CreateMembersAndPeople extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addUniqueKey('line_id');
-        $this->forge->createTable('people');
+        $this->forge->createTable('people', true);
 
         // Create 'members' table
         $this->forge->addField([
@@ -98,7 +98,7 @@ class CreateMembersAndPeople extends Migration
         $this->forge->addKey('id', true);
         $this->forge->addUniqueKey('member_code');
         $this->forge->addForeignKey('contact_id', 'people', 'id', 'CASCADE', 'SET NULL');
-        $this->forge->createTable('members');
+        $this->forge->createTable('members', true);
 
         
     }
