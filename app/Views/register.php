@@ -1,12 +1,27 @@
+<?php
+$assetVersion = static function (string $path): string {
+    $path = ltrim($path, '/');
+    $fullPath = rtrim(FCPATH, '/\\') . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+    $mtime = is_file($fullPath) ? @filemtime($fullPath) : false;
+
+    return $mtime === false ? '1' : (string) $mtime;
+};
+
+$assetUrl = static function (string $path) use ($assetVersion): string {
+    $path = ltrim($path, '/');
+
+    return base_url($path) . '?v=' . $assetVersion($path);
+};
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ลงทะเบียนร้านค้า | PH.EASY</title>
-    <link rel="stylesheet" href="/assets/css/bulma.min.css?v=<?= file_exists(FCPATH . 'assets/css/bulma.min.css') ? filemtime(FCPATH . 'assets/css/bulma.min.css') : '1' ?>">
-    <link rel="stylesheet" href="/assets/css/theme.css?v=<?= file_exists(FCPATH . 'assets/css/theme.css') ? filemtime(FCPATH . 'assets/css/theme.css') : '1' ?>">
-    <link rel="stylesheet" href="/assets/css/register.css?v=<?= file_exists(FCPATH . 'assets/css/register.css') ? filemtime(FCPATH . 'assets/css/register.css') : '1' ?>">
+    <link rel="stylesheet" href="<?= esc($assetUrl('assets/css/bulma.min.css'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc($assetUrl('assets/css/theme.css'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc($assetUrl('assets/css/register.css'), 'attr') ?>">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
@@ -23,7 +38,7 @@
                 </div>
                 <div class="has-text-centered">
                     <figure class="image is-48x48 is-inline-block">
-                        <img id="profileImage" src="/assets/img/user-mockup.svg" class="is-rounded" alt="Profile">
+                        <img id="profileImage" src="<?= esc(base_url('assets/img/user-mockup.svg'), 'attr') ?>" class="is-rounded" alt="Profile">
                     </figure>
                     <p class="has-text-light is-size-7 mt-0" id="profileName">Guest</p>
                 </div>
@@ -39,7 +54,7 @@
                 </div>
             <?php endif; ?>
 
-            <form method="post" action="/register/submit" id="registerForm" class="<?= $showWelcome ? 'is-hidden' : '' ?>">
+            <form method="post" action="<?= esc(site_url('register/submit'), 'attr') ?>" id="registerForm" class="<?= $showWelcome ? 'is-hidden' : '' ?>">
                 <?= csrf_field() ?>
 
                 <div class="field">
@@ -134,6 +149,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
-<script src="/assets/js/register.js?v=<?= file_exists(FCPATH . 'assets/js/register.js') ? filemtime(FCPATH . 'assets/js/register.js') : '1' ?>"></script>
+<script src="<?= esc($assetUrl('assets/js/register.js'), 'attr') ?>"></script>
 </body>
 </html>
