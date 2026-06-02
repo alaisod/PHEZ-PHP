@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ลงทะเบียนร้านค้า | PH.EASY</title>
-    <link rel="stylesheet" href="/assets/css/bulma.min.css?v=<?= filemtime(FCPATH . 'assets/css/bulma.min.css') ?>">
-    <link rel="stylesheet" href="/assets/css/theme.css?v=<?= filemtime(FCPATH . 'assets/css/theme.css') ?>">
-    <link rel="stylesheet" href="/assets/css/register.css?v=<?= filemtime(FCPATH . 'assets/css/register.css') ?>">
+    <link rel="stylesheet" href="/assets/css/bulma.min.css?v=<?= file_exists(FCPATH . 'assets/css/bulma.min.css') ? filemtime(FCPATH . 'assets/css/bulma.min.css') : '1' ?>">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=<?= file_exists(FCPATH . 'assets/css/theme.css') ? filemtime(FCPATH . 'assets/css/theme.css') : '1' ?>">
+    <link rel="stylesheet" href="/assets/css/register.css?v=<?= file_exists(FCPATH . 'assets/css/register.css') ? filemtime(FCPATH . 'assets/css/register.css') : '1' ?>">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
@@ -134,6 +134,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
-<script src="/assets/js/register.js?v=<?= filemtime(FCPATH . 'assets/js/register.js') ?>"></script>
+<script src="/assets/js/register.js?v=<?= file_exists(FCPATH . 'assets/js/register.js') ? filemtime(FCPATH . 'assets/js/register.js') : '1' ?>"></script>
 </body>
 </html>
