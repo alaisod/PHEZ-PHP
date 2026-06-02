@@ -4,43 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ลงทะเบียนร้านค้า | PH.EASY</title>
-    <link rel="stylesheet" href="/assets/css/bulma.min.css">
-    <link rel="stylesheet" href="/assets/css/theme.css">
+    <link rel="stylesheet" href="/assets/css/bulma.min.css?v=<?= filemtime(FCPATH . 'assets/css/bulma.min.css') ?>">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=<?= filemtime(FCPATH . 'assets/css/theme.css') ?>">
+    <link rel="stylesheet" href="/assets/css/register.css?v=<?= filemtime(FCPATH . 'assets/css/register.css') ?>">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
-    <style>
-        .glow {
-            animation: glow 1.5s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            from { text-shadow: 0 0 6px rgba(255, 204, 0, 0.5); }
-            to { text-shadow: 0 0 16px rgba(255, 204, 0, 0.9); }
-        }
-        .pop {
-            animation: pop 0.8s ease;
-        }
-        .welcome-screen {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .welcome-active .section {
-            padding: 0;
-            display: flex;
-            align-items: center;
-        }
-        .welcome-active .container {
-            padding: 0;
-        }
-        .welcome-active .box.theme-card {
-            margin: 0 1rem;
-        }
-        @keyframes pop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-    </style>
 </head>
 
 <body class="theme-bg <?= $showWelcome ? 'welcome-active' : '' ?>">
@@ -155,195 +124,15 @@
     </div>
 </section>
 
+<script>
+    // Data bootstrap: pass PHP data to external JS
+    window._member = <?= json_encode($member ?? null) ?>;
+    window._showWelcome = <?= $showWelcome ? 'true' : 'false' ?>;
+</script>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
-<script>
-    const defaultLat = 16.4419;
-    const defaultLng = 102.8350;
-
-    const map = L.map('map').setView([defaultLat, defaultLng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-    }).addTo(map);
-
-    let marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
-
-    const autoLocateBtn = document.getElementById('autoLocate');
-
-    function setGeoStatus(text, type = 'warning') {
-        autoLocateBtn.textContent = text;
-        autoLocateBtn.className = `button is-${type}`;
-        if (type === 'warning') {
-            autoLocateBtn.classList.add('is-light');
-        }
-    }
-
-    function updateGeo(lat, lng) {
-        const value = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-        document.getElementById('geoDisplay').value = value;
-        document.getElementById('geoPreview').textContent = value;
-        setGeoStatus('ได้พิกัดแล้ว', 'success');
-    }
-
-    function setMarker(latlng) {
-        marker.setLatLng(latlng);
-        updateGeo(latlng.lat, latlng.lng);
-    }
-
-    marker.on('dragend', (event) => {
-        const pos = event.target.getLatLng();
-        updateGeo(pos.lat, pos.lng);
-    });
-
-    map.on('click', (event) => setMarker(event.latlng));
-
-    function requestAutoLocate() {
-        if (!navigator.geolocation) {
-            setGeoStatus('ไม่รองรับ GPS', 'danger');
-            return;
-        }
-        setGeoStatus('กำลังดึงพิกัด…', 'warning');
-        navigator.geolocation.getCurrentPosition((position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            map.setView([lat, lng], 16);
-            setMarker({ lat, lng });
-        }, () => {
-            setGeoStatus('⟳ ลองอีกครั้ง', 'danger');
-        }, { enableHighAccuracy: true, timeout: 8000 });
-    }
-
-    const mapModal = document.getElementById('mapModal');
-    const openMap = document.getElementById('openMap');
-    const closeMap = document.getElementById('closeMap');
-    const confirmMap = document.getElementById('confirmMap');
-
-    function openMapModal() {
-        mapModal.classList.add('is-active');
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 200);
-    }
-
-    function closeMapModal() {
-        mapModal.classList.remove('is-active');
-    }
-
-    openMap.addEventListener('click', openMapModal);
-    closeMap.addEventListener('click', closeMapModal);
-    mapModal.querySelector('.modal-background').addEventListener('click', closeMapModal);
-    confirmMap.addEventListener('click', closeMapModal);
-
-    document.getElementById('autoLocate').addEventListener('click', requestAutoLocate);
-    window.addEventListener('load', requestAutoLocate);
-
- 
-
-    let liffReady = false;
-
-    function disableForm() {
-        document.getElementById('registerForm')?.classList.add('is-hidden');
-        document.getElementById('alreadyRegistered')?.classList.remove('is-hidden');
-    }
-
-    function showRegisteredInfo(member) {
-        const info = `Member Code: ${member.member_code} | ร้าน: ${member.shop_name}`;
-        document.getElementById('registeredInfo').textContent = info;
-    }
-
-    async function checkLineDuplicate(lineId) {
-        try {
-            const response = await fetch(`/register/check-line?line_id=${encodeURIComponent(lineId)}`);
-            if (!response.ok) {
-                return false;
-            }
-            const data = await response.json();
-            if (data.exists && data.member) {
-                disableForm();
-                showRegisteredInfo(data.member);
-                return true;
-            }
-        } catch (error) {
-            console.error('Check line duplicate failed', error);
-        }
-        return false;
-    }
-
-    async function initLiff() {
-        const liffId = '2010178930-H6pNBOQl';
-        if (typeof liff === 'undefined') {
-            return false;
-        }
-        try {
-            await liff.init({ liffId });
-            if (!liff.isLoggedIn()) {
-                if (liff.isInClient()) {
-                    liff.login();
-                    return false;
-                }
-                return false;
-            }
-            const profile = await liff.getProfile();
-            document.getElementById('lineId').value = profile.userId;
-            document.getElementById('lineDisplayName').value = profile.displayName || '';
-            document.getElementById('profileName').textContent = profile.displayName || 'User';
-            if (profile.pictureUrl) {
-                document.getElementById('profileImage').src = profile.pictureUrl;
-            }
-            document.getElementById('isLiff').value = '1';
-            liffReady = true;
-            if (!showWelcome) {
-                await checkLineDuplicate(profile.userId);
-            }
-            return true;
-        } catch (error) {
-            console.error('LIFF init failed', error);
-            return false;
-        }
-    }
-
-    const member = <?= json_encode($member ?? null) ?>;
-    const showWelcome = <?= $showWelcome ? 'true' : 'false' ?>;
-
-    if (showWelcome) {
-        document.getElementById('welcomeSection')?.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function closeApp() {
-        if (typeof liff !== 'undefined' && liff.isInClient()) {
-            liff.closeWindow();
-        } else {
-            window.location.href = '/';
-        }
-    }
-
-    document.getElementById('closeLiff')?.addEventListener('click', closeApp);
-    document.getElementById('closeRegistered')?.addEventListener('click', closeApp);
-
-    async function sendLineMessage() {
-        if (!showWelcome || !member || !member.line_id || typeof liff === 'undefined') {
-            return;
-        }
-        if (!liffReady) {
-            return;
-        }
-        try {
-            if (!liff.isInClient()) {
-                return;
-            }
-            const text = `สมัครสมาชิกสำเร็จ\nMember Code: ${member.member_code}\nร้าน: ${member.shop_name}\nผู้ติดต่อ: ${member.person_name}\nเบอร์โทร: ${member.telephone}`;
-            await liff.sendMessages([{ type: 'text', text }]);
-        } catch (error) {
-            console.error('Send message failed', error);
-        }
-    }
-
-    (async () => {
-        await initLiff();
-        await sendLineMessage();
-    })();
-</script>
+<script src="/assets/js/register.js?v=<?= filemtime(FCPATH . 'assets/js/register.js') ?>"></script>
 </body>
 </html>

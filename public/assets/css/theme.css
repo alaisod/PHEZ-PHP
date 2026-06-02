@@ -30,3 +30,22 @@ body.theme-bg {
     border: 2px solid #ffcc00;
     border-radius: 8px;
 }
+
+/* Animations */
+.glow {
+    animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 6px rgba(255, 204, 0, 0.5); }
+    to { text-shadow: 0 0 16px rgba(255, 204, 0, 0.9); }
+}
+
+.pop {
+    animation: pop 0.8s ease;
+}
+
+@keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}

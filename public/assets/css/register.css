@@ -1,0 +1,19 @@
+.welcome-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-active .section {
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.welcome-active .container {
+    padding: 0;
+}
+
+.welcome-active .box.theme-card {
+    margin: 0 1rem;
+}
