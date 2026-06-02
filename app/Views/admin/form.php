@@ -31,7 +31,7 @@
                     </div>
                 <?php endif; ?>
 
-                <form method="post" action="/admin/save">
+                <form method="post" action="/admin/save" enctype="multipart/form-data">
                     <?= csrf_field() ?>
 
                     <?php if ($member) : ?>
@@ -78,6 +78,34 @@
                         <label class="label has-text-warning">พิกัดร้าน (ละติจูด,ลองจิจูด)</label>
                         <div class="control">
                             <input class="input" type="text" name="geo_location" value="<?= old('geo_location', $member['geo_location'] ?? '') ?>" required placeholder="เช่น 16.4419,102.8350">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label has-text-warning">รูปหน้าร้าน</label>
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <?php if ($member && ! empty($member['store_photo'])) : ?>
+                                    <figure class="image is-96x96">
+                                        <img src="/uploads/store_photos/<?= esc($member['store_photo']) ?>" alt="Store" style="border-radius:12px;object-fit:cover;border:2px solid #3a3a5c">
+                                    </figure>
+                                    <input type="hidden" name="existing_photo" value="<?= esc($member['store_photo']) ?>">
+                                <?php else : ?>
+                                    <div style="width:96px;height:96px;border-radius:12px;border:2px dashed #3a3a5c;display:flex;align-items:center;justify-content:center;color:#7a7a7a;font-size:2rem">&#x1F4F7;</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="column">
+                                <div class="file is-warning is-small">
+                                    <label class="file-label">
+                                        <input class="file-input" type="file" name="store_photo" accept="image/*">
+                                        <span class="file-cta">
+                                            <span class="file-icon">&#x1F4C1;</span>
+                                            <span class="file-label">เลือกรูปภาพ</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <p class="help has-text-grey mt-1">รองรับ JPG, PNG, WebP ขนาดไม่เกิน 5MB</p>
+                            </div>
                         </div>
                     </div>
 

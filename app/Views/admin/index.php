@@ -64,6 +64,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>รูป</th>
                                     <th>รหัส</th>
                                     <th>ชื่อร้าน</th>
                                     <th>เบอร์โทร</th>
@@ -80,6 +81,15 @@
                                 <?php foreach ($members as $member) : ?>
                                     <tr>
                                         <td><?= $i++ ?></td>
+                                        <td>
+                                            <?php if (! empty($member['store_photo'])) : ?>
+                                                <figure class="image is-32x32" style="margin:0 auto">
+                                                    <img src="/uploads/store_photos/<?= esc($member['store_photo']) ?>" alt="" style="border-radius:6px;object-fit:cover">
+                                                </figure>
+                                            <?php else : ?>
+                                                <span class="has-text-grey is-size-7">-</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><strong><?= esc($member['member_code']) ?></strong></td>
                                         <td><?= esc($member['shop_name']) ?></td>
                                         <td><?= esc($member['shop_telephone']) ?></td>

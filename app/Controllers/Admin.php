@@ -81,6 +81,34 @@ class Admin extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
+        // ── Handle store photo upload ──
+        $storePhoto = null;
+        $photoFile = $this->request->getFile('store_photo');
+
+        if ($photoFile !== null && $photoFile->isValid() && ! $photoFile->hasMoved()) {
+            $validationRule = [
+                'store_photo' => [
+                    'rules'  => 'is_image[store_photo]|max_size[store_photo,5120]|mime_in[store_photo,image/jpg,image/jpeg,image/png,image/webp]',
+                    'errors' => [
+                        'is_image' => 'ไฟล์ที่อัปโหลดต้องเป็นรูปภาพ',
+                        'max_size' => 'รูปภาพต้องมีขนาดไม่เกิน 5MB',
+                        'mime_in'  => 'รองรับเฉพาะไฟล์ JPG, PNG, WebP เท่านั้น',
+                    ],
+                ],
+            ];
+
+            if ($this->validate($validationRule)) {
+                $storePhoto = $photoFile->getRandomName();
+                $uploadPath = FCPATH . 'uploads/store_photos';
+
+                if (! is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+
+                $photoFile->move($uploadPath, $storePhoto);
+            }
+        }
+
         $memberId = $this->request->getPost('id');
         $memberId = $memberId ? (int) $memberId : null;
 
@@ -118,6 +146,7 @@ class Admin extends BaseController
                     'shop_telephone' => $this->request->getPost('shop_telephone'),
                     'address'        => $this->request->getPost('address') ?: null,
                     'geo_location'   => $this->request->getPost('geo_location'),
+                    'store_photo'    => $storePhoto ?: ($this->request->getPost('existing_photo') ?: null),
                     'contact_id'     => $contactId,
                 ]);
             } else {
@@ -125,6 +154,14 @@ class Admin extends BaseController
                 $member = $memberModel->find($memberId);
                 if (! $member) {
                     throw new \RuntimeException('Member not found');
+                }
+
+                // Delete old photo if new one uploaded
+                if ($storePhoto !== null && ! empty($member['store_photo'])) {
+                    $oldPath = FCPATH . 'uploads/store_photos/' . $member['store_photo'];
+                    if (is_file($oldPath)) {
+                        unlink($oldPath);
+                    }
                 }
 
                 // Skip model validation on update — controller validation already ran
@@ -142,6 +179,7 @@ class Admin extends BaseController
                     'shop_telephone' => $this->request->getPost('shop_telephone'),
                     'address'        => $this->request->getPost('address') ?: null,
                     'geo_location'   => $this->request->getPost('geo_location'),
+                    'store_photo'    => $storePhoto ?: ($this->request->getPost('existing_photo') ?: null),
                 ]);
             }
 

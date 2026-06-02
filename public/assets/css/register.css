@@ -25,3 +25,88 @@
     margin-top: 1rem;
     opacity: 0.5;
 }
+
+/* ── Store Photo Upload ── */
+.photo-upload-area {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #1a1a2e;
+    border: 2px dashed #3a3a5c;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-upload-area:hover {
+    border-color: #ffdd57;
+    background: #1e1e35;
+}
+
+.photo-upload-area.has-image {
+    border-style: solid;
+    border-color: #2a2a4a;
+}
+
+.photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.photo-icon {
+    font-size: 3rem;
+    line-height: 1;
+    filter: grayscale(0.3);
+}
+
+.photo-text {
+    color: #7a7a7a;
+    font-size: 0.85rem;
+}
+
+.photo-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s ease;
+}
+
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    display: flex;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+/* ── Welcome Photo ── */
+.welcome-photo-box {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 3px solid #ffdd57;
+    box-shadow: 0 0 20px rgba(255, 221, 87, 0.3);
+}
+
+.welcome-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

@@ -80,6 +80,63 @@ confirmMap.addEventListener('click', closeMapModal);
 document.getElementById('autoLocate').addEventListener('click', requestAutoLocate);
 window.addEventListener('load', requestAutoLocate);
 
+// ── Store Photo ─────────────────────────────────────────────
+const photoInput = document.getElementById('storePhotoInput');
+const photoArea = document.getElementById('photoArea');
+const photoPreview = document.getElementById('photoPreview');
+const photoPlaceholder = document.getElementById('photoPlaceholder');
+const photoOverlay = document.getElementById('photoOverlay');
+const removePhotoBtn = document.getElementById('removePhoto');
+const takePhotoBtn = document.getElementById('takePhotoBtn');
+const choosePhotoBtn = document.getElementById('choosePhotoBtn');
+
+function handlePhotoSelect(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        photoPreview.src = e.target.result;
+        photoPreview.classList.remove('is-hidden');
+        photoPlaceholder.classList.add('is-hidden');
+        photoOverlay.classList.remove('is-hidden');
+        photoArea.classList.add('has-image');
+    };
+    reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+    photoInput.value = '';
+    photoPreview.src = '';
+    photoPreview.classList.add('is-hidden');
+    photoPlaceholder.classList.remove('is-hidden');
+    photoOverlay.classList.add('is-hidden');
+    photoArea.classList.remove('has-image');
+}
+
+photoInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+        handlePhotoSelect(this.files[0]);
+    }
+});
+
+takePhotoBtn.addEventListener('click', function () {
+    photoInput.removeAttribute('capture');
+    photoInput.setAttribute('capture', 'environment');
+    photoInput.click();
+});
+
+choosePhotoBtn.addEventListener('click', function () {
+    photoInput.removeAttribute('capture');
+    photoInput.click();
+});
+
+removePhotoBtn.addEventListener('click', removePhoto);
+
+photoArea.addEventListener('click', function () {
+    if (!photoPreview.classList.contains('is-hidden')) return;
+    photoInput.removeAttribute('capture');
+    photoInput.click();
+});
+
 // ── LIFF & Registration ──────────────────────────────────────
 var liffReady = false;
 

@@ -54,7 +54,7 @@ $assetUrl = static function (string $path) use ($assetVersion): string {
                 </div>
             <?php endif; ?>
 
-            <form method="post" action="<?= esc(site_url('register/submit'), 'attr') ?>" id="registerForm" class="<?= $showWelcome ? 'is-hidden' : '' ?>">
+            <form method="post" action="<?= esc(site_url('register/submit'), 'attr') ?>" id="registerForm" class="<?= $showWelcome ? 'is-hidden' : '' ?>" enctype="multipart/form-data">
                 <?= csrf_field() ?>
 
                 <div class="field">
@@ -107,6 +107,31 @@ $assetUrl = static function (string $path) use ($assetVersion): string {
                     </div>
                 </div>
 
+                <!-- ── Store Photo ── -->
+                <div class="field">
+                    <label class="label has-text-warning">รูปหน้าร้าน</label>
+                    <div class="photo-upload-area" id="photoArea">
+                        <div class="photo-placeholder" id="photoPlaceholder">
+                            <span class="photo-icon">&#x1F4F7;</span>
+                            <span class="photo-text">เพิ่มรูปหน้าร้าน</span>
+                        </div>
+                        <img class="photo-preview is-hidden" id="photoPreview" alt="Store photo">
+                        <div class="photo-overlay is-hidden" id="photoOverlay">
+                            <button type="button" class="button is-small is-danger" id="removePhoto">&#x2715; ลบรูป</button>
+                        </div>
+                    </div>
+                    <div class="buttons is-centered mt-2" style="gap:0.5rem">
+                        <button type="button" class="button is-warning is-light is-small" id="takePhotoBtn">
+                            &#x1F4F7; ถ่ายรูป
+                        </button>
+                        <button type="button" class="button is-warning is-light is-small" id="choosePhotoBtn">
+                            &#x1F4C2; เลือกรูปภาพ
+                        </button>
+                    </div>
+                    <input type="file" id="storePhotoInput" name="store_photo" accept="image/*" capture="environment" class="is-hidden">
+                    <p class="help has-text-grey is-size-7">รองรับ JPG, PNG, WebP ขนาดไม่เกิน 5MB</p>
+                </div>
+
                 <input type="hidden" name="line_id" id="lineId">
                 <input type="hidden" name="line_display_name" id="lineDisplayName">
                 <input type="hidden" name="is_liff" id="isLiff" value="0">
@@ -129,6 +154,11 @@ $assetUrl = static function (string $path) use ($assetVersion): string {
                 <div class="box theme-card has-text-centered pop">
                     <h1 class="title has-text-warning glow">ยินดีต้อนรับ!</h1>
                     <p class="subtitle has-text-light"><?= esc($welcomeMessage ?? 'ขอบคุณสำหรับการลงทะเบียน') ?></p>
+                    <?php if ($member && ! empty($member['store_photo'])) : ?>
+                        <div class="welcome-photo-box">
+                            <img src="/uploads/store_photos/<?= esc($member['store_photo']) ?>" alt="Store" class="welcome-photo">
+                        </div>
+                    <?php endif; ?>
                     <div class="notification theme-notice">
                         <p>Member Code</p>
                         <p class="is-size-3 has-text-weight-bold has-text-warning glow"><?= esc($memberCode ?? '') ?></p>

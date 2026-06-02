@@ -19,6 +19,7 @@ class MemberModel extends Model
         'shop_telephone',
         'address',
         'geo_location',
+        'store_photo',
         'contact_id',
     ];
 
@@ -53,7 +54,7 @@ class MemberModel extends Model
      */
     public function getMemberWithContact($where): ?array
     {
-        $result = $this->select('members.*, people.person_name, people.telephone, people.line_id')
+        $result = $this->select('members.*, people.person_name, people.telephone, people.line_id, people.line_display_name')
             ->join('people', 'people.id = members.contact_id', 'left')
             ->where($where)
             ->first();
