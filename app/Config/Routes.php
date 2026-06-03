@@ -19,6 +19,8 @@ $routes->get('logout', 'Auth::logout');
 // Admin (protected by auth filter)
 $routes->group('admin', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Admin::index');
+    $routes->get('map', 'Admin::map');
+    $routes->get('map-data', 'Admin::mapData');
     $routes->get('create', 'Admin::create');
     $routes->get('edit/(:num)', 'Admin::edit/$1');
     $routes->post('save', 'Admin::save');

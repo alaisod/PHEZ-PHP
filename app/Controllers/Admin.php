@@ -228,4 +228,25 @@ class Admin extends BaseController
 
         return redirect()->to('/admin')->with('success', 'ลบสมาชิกสำเร็จ');
     }
+
+    public function map(): string
+    {
+        return view('admin/map');
+    }
+
+    public function mapData(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        /** @var MemberModel $memberModel */
+        $memberModel = model(MemberModel::class);
+
+        $members = $memberModel
+            ->select('members.id, members.shop_name, members.member_code, members.geo_location, members.store_photo, members.shop_telephone, members.address')
+            ->where('members.geo_location IS NOT NULL')
+            ->where('members.geo_location !=', '')
+            ->findAll();
+
+        return $this->response
+            ->setContentType('application/json')
+            ->setJSON($members);
+    }
 }

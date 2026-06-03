@@ -18,6 +18,7 @@
                         <p class="subtitle has-text-light">PH.EASY Admin Dashboard</p>
                     </div>
                     <div class="is-flex is-align-items-center" style="gap:0.5rem">
+                        <a href="/admin/map" class="button is-warning is-light">แสดงแผนที่</a>
                         <a href="/admin/create" class="button is-warning">+ เพิ่มสมาชิก</a>
                         <a href="/logout" class="button is-light is-small">ออกจากระบบ</a>
                     </div>
