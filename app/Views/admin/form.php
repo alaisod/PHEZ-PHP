@@ -83,7 +83,7 @@
 
                     <div class="field">
                         <label class="label has-text-warning">รูปหน้าร้าน</label>
-                        <div class="field-body" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+                        <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;flex:1">
                             <div>
                                 <?php if ($member && ! empty($member['store_photo'])) : ?>
                                     <figure class="image is-96x96" style="overflow:hidden">
