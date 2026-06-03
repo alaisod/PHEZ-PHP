@@ -83,18 +83,18 @@
 
                     <div class="field">
                         <label class="label has-text-warning">รูปหน้าร้าน</label>
-                        <div class="columns is-vcentered">
-                            <div class="column is-narrow">
+                        <div class="field-body" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+                            <div>
                                 <?php if ($member && ! empty($member['store_photo'])) : ?>
-                                    <figure class="image is-96x96">
-                                        <img src="/uploads/store_photos/<?= esc($member['store_photo']) ?>" alt="Store" style="border-radius:12px;object-fit:cover;border:2px solid #3a3a5c">
+                                    <figure class="image is-96x96" style="overflow:hidden">
+                                        <img src="/uploads/store_photos/<?= esc($member['store_photo']) ?>" alt="Store" style="border-radius:12px;object-fit:cover;border:2px solid #3a3a5c;width:100%;height:100%;display:block">
                                     </figure>
                                     <input type="hidden" name="existing_photo" value="<?= esc($member['store_photo']) ?>">
                                 <?php else : ?>
                                     <div style="width:96px;height:96px;border-radius:12px;border:2px dashed #3a3a5c;display:flex;align-items:center;justify-content:center;color:#7a7a7a;font-size:2rem">&#x1F4F7;</div>
                                 <?php endif; ?>
                             </div>
-                            <div class="column">
+                            <div style="min-width:200px">
                                 <div class="file is-warning is-small">
                                     <label class="file-label">
                                         <input class="file-input" type="file" name="store_photo" accept="image/*">
