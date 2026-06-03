@@ -35,7 +35,7 @@
                 <form method="get" action="/admin" class="mb-4">
                     <div class="field has-addons">
                         <div class="control is-expanded">
-                            <input class="input" type="text" name="q" placeholder="ค้นหา ร้าน, รหัส, เบอร์, ผู้ติดต่อ, LINE ID..." value="<?= esc($search) ?>">
+                            <input class="input" type="text" name="q" placeholder="ค้นหา ร้าน, รหัส, เบอร์, ผู้ติดต่อ..." value="<?= esc($search) ?>">
                         </div>
                         <div class="control">
                             <button type="submit" class="button is-warning">ค้นหา</button>
@@ -69,7 +69,6 @@
                                     <th>ชื่อร้าน</th>
                                     <th>เบอร์โทร</th>
                                     <th>ผู้ติดต่อ</th>
-                                    <th>LINE ID</th>
                                     <th>พิกัด</th>
                                     <th>ที่อยู่</th>
                                     <th>วันที่</th>
@@ -83,8 +82,8 @@
                                         <td><?= $i++ ?></td>
                                         <td>
                                             <?php if (! empty($member['store_photo'])) : ?>
-                                                <figure class="image is-32x32" style="margin:0 auto">
-                                                    <img src="/uploads/store_photos/<?= esc($member['store_photo']) ?>" alt="" style="border-radius:6px;object-fit:cover">
+                                                <figure class="image is-32x32" style="margin:0 auto;overflow:hidden">
+                                                    <img src="/uploads/store_photos/<?= esc($member['store_photo']) ?>" alt="" style="border-radius:6px;object-fit:cover;width:100%;height:100%;display:block">
                                                 </figure>
                                             <?php else : ?>
                                                 <span class="has-text-grey is-size-7">-</span>
@@ -94,8 +93,15 @@
                                         <td><?= esc($member['shop_name']) ?></td>
                                         <td><?= esc($member['shop_telephone']) ?></td>
                                         <td><?= esc($member['person_name'] ?? '-') ?></td>
-                                        <td class="is-size-7"><?= esc($member['line_id'] ?? '-') ?></td>
-                                        <td class="is-size-7"><?= esc($member['geo_location']) ?></td>
+                                        <td class="is-size-7">
+                                            <?php if (! empty($member['geo_location'])) : ?>
+                                                <a href="https://www.google.com/maps?q=<?= urlencode($member['geo_location']) ?>" target="_blank" rel="noopener" class="has-text-warning is-size-7" title="<?= esc($member['geo_location']) ?>">
+                                                    เปิดแผนที่ ↗
+                                                </a>
+                                            <?php else : ?>
+                                                <span class="has-text-grey">-</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="is-size-7"><?= esc($member['address'] ?? '-') ?></td>
                                         <td class="is-size-7"><?= esc(date('d/m/Y', strtotime($member['created_at']))) ?></td>
                                         <td class="has-text-nowrap">
