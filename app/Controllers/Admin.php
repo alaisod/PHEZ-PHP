@@ -282,6 +282,42 @@ class Admin extends BaseController
         return redirect()->to('/admin')->with('success', 'ลบสมาชิกสำเร็จ');
     }
 
+    public function exportCsv(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        /** @var MemberModel $memberModel */
+        $memberModel = model(MemberModel::class);
+
+        $members = $memberModel
+            ->select('members.*, people.person_name, people.telephone, people.line_id, people.line_display_name')
+            ->join('people', 'people.id = members.contact_id', 'left')
+            ->orderBy('members.created_at', 'DESC')
+            ->findAll();
+
+        // BOM for UTF-8 Excel compatibility
+        $csv = "\xEF\xBB\xBF";
+
+        // Header row
+        $csv .= '"รหัสสมาชิก","ชื่อร้าน","เบอร์โทรร้าน","ผู้ติดต่อ","เบอร์ผู้ติดต่อ","LINE ID","LINE Display Name","พิกัด GPS","ที่อยู่","วันที่สมัคร"' . "\n";
+
+        foreach ($members as $m) {
+            $csv .= '"' . str_replace('"', '""', $m['member_code']) . '",';
+            $csv .= '"' . str_replace('"', '""', $m['shop_name']) . '",';
+            $csv .= '"' . str_replace('"', '""', $m['shop_telephone']) . '",';
+            $csv .= '"' . str_replace('"', '""', ($m['person_name'] ?? '')) . '",';
+            $csv .= '"' . str_replace('"', '""', ($m['telephone'] ?? '')) . '",';
+            $csv .= '"' . str_replace('"', '""', ($m['line_id'] ?? '')) . '",';
+            $csv .= '"' . str_replace('"', '""', ($m['line_display_name'] ?? '')) . '",';
+            $csv .= '"' . str_replace('"', '""', $m['geo_location']) . '",';
+            $csv .= '"' . str_replace('"', '""', ($m['address'] ?? '')) . '",';
+            $csv .= '"' . str_replace('"', '""', date('d/m/Y H:i', strtotime($m['created_at']))) . '"' . "\n";
+        }
+
+        return $this->response
+            ->setContentType('text/csv; charset=UTF-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="members-export-' . date('Y-m-d') . '.csv"')
+            ->setBody($csv);
+    }
+
     public function map(): string
     {
         return view('admin/map');

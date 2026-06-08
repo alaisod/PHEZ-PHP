@@ -25,6 +25,7 @@ $routes->group('admin', ['filter' => 'auth'], static function ($routes) {
     $routes->get('edit/(:num)', 'Admin::edit/$1');
     $routes->post('save', 'Admin::save');
     $routes->post('delete/(:num)', 'Admin::delete/$1');
+    $routes->get('export-csv', 'Admin::exportCsv');
 
     // User management (admin only — permission checked in controller)
     $routes->get('users', 'Admin::users');

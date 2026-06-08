@@ -19,6 +19,7 @@
                     </div>
                     <div class="is-flex is-align-items-center" style="gap:0.5rem">
                         <a href="/admin/map" class="button is-warning is-light">แสดงแผนที่</a>
+                        <a href="/admin/export-csv" class="button is-success is-light">📥 Export CSV</a>
                         <?php if ($canEdit) : ?>
                             <a href="/admin/create" class="button is-warning">+ เพิ่มสมาชิก</a>
                         <?php endif; ?>
