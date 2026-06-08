@@ -19,7 +19,12 @@
                     </div>
                     <div class="is-flex is-align-items-center" style="gap:0.5rem">
                         <a href="/admin/map" class="button is-warning is-light">แสดงแผนที่</a>
-                        <a href="/admin/create" class="button is-warning">+ เพิ่มสมาชิก</a>
+                        <?php if ($canEdit) : ?>
+                            <a href="/admin/create" class="button is-warning">+ เพิ่มสมาชิก</a>
+                        <?php endif; ?>
+                        <?php if ($canDelete) : ?>
+                            <a href="/admin/users" class="button is-warning is-light">จัดการผู้ใช้</a>
+                        <?php endif; ?>
                         <a href="/logout" class="button is-light is-small">ออกจากระบบ</a>
                     </div>
                 </div>
@@ -106,8 +111,11 @@
                                         <td class="is-size-7"><?= esc($member['address'] ?? '-') ?></td>
                                         <td class="is-size-7"><?= esc(date('d/m/Y', strtotime($member['created_at']))) ?></td>
                                         <td class="has-text-nowrap">
-                                            <a href="/admin/edit/<?= $member['id'] ?>" class="button is-small is-warning is-light">แก้ไข</a>
-                                            <button type="button" class="button is-small is-danger is-light btn-delete" data-id="<?= $member['id'] ?>" data-name="<?= esc($member['shop_name']) ?>">ลบ</button>
+                                            <?php if ($canEdit) : ?>
+                                                <a href="/admin/edit/<?= $member['id'] ?>" class="button is-small is-warning is-light">แก้ไข</a>
+                                            <?php else : ?>
+                                                <span class="has-text-grey is-size-7">-</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -136,27 +144,7 @@
         </div>
     </section>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal" id="deleteModal">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head theme-card">
-                <p class="modal-card-title has-text-warning">ยืนยันการลบ</p>
-                <button class="delete" aria-label="close" id="closeDeleteModal"></button>
-            </header>
-            <section class="modal-card-body theme-card">
-                <p class="has-text-light">คุณแน่ใจหรือไม่ที่จะลบ <strong id="deleteName" class="has-text-warning"></strong>?</p>
-                <p class="has-text-grey is-size-7 mt-2">การกระทำนี้ไม่สามารถย้อนกลับได้</p>
-            </section>
-            <footer class="modal-card-foot theme-card">
-                <button class="button" id="cancelDelete">ยกเลิก</button>
-                <form method="post" action="" id="deleteForm" style="display:inline">
-                    <?= csrf_field() ?>
-                    <button type="submit" class="button is-danger" id="confirmDelete">ลบ</button>
-                </form>
-            </footer>
-        </div>
-    </div>
+
 
     <script src="/assets/js/admin.js?v=<?= file_exists(FCPATH . 'assets/js/admin.js') ? filemtime(FCPATH . 'assets/js/admin.js') : '1' ?>"></script>
 </body>

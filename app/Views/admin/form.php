@@ -124,6 +124,70 @@
                         </div>
                     </div>
                 </form>
+
+                <?php if ($member && $canDelete) : ?>
+                    <!-- ── Danger Zone: Delete ── -->
+                    <hr class="has-background-grey-darker">
+                    <div class="notification is-danger is-light" style="border:1px solid #ff3860;border-radius:12px">
+                        <h3 class="title is-5 has-text-danger">&#x26A0; โซนอันตราย</h3>
+                        <p class="mb-3 has-text-dark">เมื่อลบข้อมูลแล้ว <strong>ไม่สามารถย้อนกลับได้</strong> โปรดตรวจสอบให้แน่ใจก่อนดำเนินการ</p>
+                        <button type="button" class="button is-danger" id="btnDeleteMember" data-id="<?= $member['id'] ?>" data-name="<?= esc($member['shop_name']) ?>">
+                            ลบสมาชิกนี้
+                        </button>
+                    </div>
+
+                    <!-- Delete Confirmation Modal -->
+                    <div class="modal" id="deleteModal">
+                        <div class="modal-background"></div>
+                        <div class="modal-card">
+                            <header class="modal-card-head theme-card">
+                                <p class="modal-card-title has-text-warning">ยืนยันการลบ</p>
+                                <button class="delete" aria-label="close" id="closeDeleteModal"></button>
+                            </header>
+                            <section class="modal-card-body theme-card">
+                                <p class="has-text-light">คุณแน่ใจหรือไม่ที่จะลบ <strong id="deleteName" class="has-text-warning"></strong>?</p>
+                                <p class="has-text-grey is-size-7 mt-2">การกระทำนี้ไม่สามารถย้อนกลับได้</p>
+                            </section>
+                            <footer class="modal-card-foot theme-card">
+                                <button class="button" id="cancelDelete">ยกเลิก</button>
+                                <form method="post" action="" id="deleteForm" style="display:inline">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="button is-danger" id="confirmDelete">ลบ</button>
+                                </form>
+                            </footer>
+                        </div>
+                    </div>
+
+                    <script>
+                    (function() {
+                        var btnDelete = document.getElementById('btnDeleteMember');
+                        if (!btnDelete) return;
+                        var deleteModal = document.getElementById('deleteModal');
+                        var deleteForm = document.getElementById('deleteForm');
+                        var deleteName = document.getElementById('deleteName');
+                        var cancelBtn = document.getElementById('cancelDelete');
+                        var closeBtn = document.getElementById('closeDeleteModal');
+
+                        function openDeleteModal(id, name) {
+                            deleteName.textContent = name;
+                            deleteForm.action = '/admin/delete/' + id;
+                            deleteModal.classList.add('is-active');
+                        }
+
+                        function closeDeleteModal() {
+                            deleteModal.classList.remove('is-active');
+                        }
+
+                        btnDelete.addEventListener('click', function() {
+                            openDeleteModal(btnDelete.getAttribute('data-id'), btnDelete.getAttribute('data-name'));
+                        });
+
+                        if (cancelBtn) cancelBtn.addEventListener('click', closeDeleteModal);
+                        if (closeBtn) closeBtn.addEventListener('click', closeDeleteModal);
+                        if (deleteModal) deleteModal.querySelector('.modal-background').addEventListener('click', closeDeleteModal);
+                    })();
+                    </script>
+                <?php endif; ?>
             </div>
         </div>
     </section>

@@ -85,6 +85,7 @@ class Setup extends BaseController
                         $db->table('users')->insert([
                             'username'   => 'admin',
                             'password'   => password_hash('admin123', PASSWORD_DEFAULT),
+                            'role'       => 'admin',
                             'created_at' => date('Y-m-d H:i:s'),
                             'updated_at' => date('Y-m-d H:i:s'),
                         ]);

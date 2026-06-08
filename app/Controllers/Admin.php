@@ -4,10 +4,40 @@ namespace App\Controllers;
 
 use App\Models\MemberModel;
 use App\Models\PeopleModel;
+use App\Models\UserModel;
 use CodeIgniter\HTTP\RedirectResponse;
 
 class Admin extends BaseController
 {
+    /**
+     * Check if the current user has a given role or higher.
+     * admin > editor > viewer
+     */
+    private function hasRole(string $required): bool
+    {
+        $role = session()->get('role') ?? 'viewer';
+
+        $hierarchy = ['viewer' => 0, 'editor' => 1, 'admin' => 2];
+
+        return ($hierarchy[$role] ?? 0) >= ($hierarchy[$required] ?? 0);
+    }
+
+    /**
+     * Check if user can delete (admin only).
+     */
+    private function canDelete(): bool
+    {
+        return session()->get('role') === 'admin';
+    }
+
+    /**
+     * Check if user can edit/create (admin or editor).
+     */
+    private function canEdit(): bool
+    {
+        return $this->hasRole('editor');
+    }
+
     public function index(): string
     {
         /** @var MemberModel $memberModel */
@@ -34,23 +64,36 @@ class Admin extends BaseController
             ->paginate($perPage);
 
         return view('admin/index', [
-            'members'  => $members,
-            'pager'    => $memberModel->pager,
-            'search'   => $search,
-            'perPage'  => $perPage,
+            'members'   => $members,
+            'pager'     => $memberModel->pager,
+            'search'    => $search,
+            'perPage'   => $perPage,
+            'canEdit'   => $this->canEdit(),
+            'canDelete' => $this->canDelete(),
+            'role'      => session()->get('role') ?? 'viewer',
         ]);
     }
 
-    public function create(): string
+    public function create()
     {
+        if (! $this->canEdit()) {
+            return redirect()->to('/admin')->with('error', 'คุณไม่มีสิทธิ์เพิ่มสมาชิก');
+        }
+
         return view('admin/form', [
-            'member' => null,
-            'errors' => session()->getFlashdata('errors') ?? [],
+            'member'    => null,
+            'errors'    => session()->getFlashdata('errors') ?? [],
+            'canEdit'   => true,
+            'canDelete' => $this->canDelete(),
         ]);
     }
 
     public function edit(int $id)
     {
+        if (! $this->canEdit()) {
+            return redirect()->to('/admin')->with('error', 'คุณไม่มีสิทธิ์แก้ไขข้อมูล');
+        }
+
         /** @var MemberModel $memberModel */
         $memberModel = model(MemberModel::class);
         $member = $memberModel->getMemberWithContact(['members.id' => $id]);
@@ -60,13 +103,19 @@ class Admin extends BaseController
         }
 
         return view('admin/form', [
-            'member' => $member,
-            'errors' => session()->getFlashdata('errors') ?? [],
+            'member'    => $member,
+            'errors'    => session()->getFlashdata('errors') ?? [],
+            'canEdit'   => true,
+            'canDelete' => $this->canDelete(),
         ]);
     }
 
     public function save(): RedirectResponse
     {
+        if (! $this->canEdit()) {
+            return redirect()->to('/admin')->with('error', 'คุณไม่มีสิทธิ์แก้ไขข้อมูล');
+        }
+
         $rules = [
             'shop_name'      => 'required|string|min_length[2]|max_length[150]',
             'shop_telephone' => 'required|string|min_length[6]|max_length[30]',
@@ -197,6 +246,10 @@ class Admin extends BaseController
 
     public function delete(int $id): RedirectResponse
     {
+        if (! $this->canDelete()) {
+            return redirect()->to('/admin')->with('error', 'คุณไม่มีสิทธิ์ลบข้อมูล');
+        }
+
         /** @var MemberModel $memberModel */
         $memberModel = model(MemberModel::class);
         /** @var PeopleModel $peopleModel */
@@ -249,4 +302,65 @@ class Admin extends BaseController
             ->setContentType('application/json')
             ->setJSON($members);
     }
+
+    // ── User Management (admin only) ─────────────────────────────
+
+    public function users()
+    {
+        if (! $this->canDelete()) {
+            return redirect()->to('/admin')->with('error', 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+        }
+
+        /** @var UserModel $userModel */
+        $userModel = model(UserModel::class);
+        $users = $userModel->select('id, username, role, created_at, updated_at')
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
+
+        return view('admin/users', [
+            'users' => $users,
+        ]);
+    }
+
+    public function createUser()
+    {
+        if (! $this->canDelete()) {
+            return redirect()->to('/admin')->with('error', 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+        }
+
+        return view('admin/user_form', [
+            'errors' => session()->getFlashdata('errors') ?? [],
+        ]);
+    }
+
+    public function saveUser(): RedirectResponse
+    {
+        if (! $this->canDelete()) {
+            return redirect()->to('/admin')->with('error', 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+        }
+
+        $rules = [
+            'username' => 'required|string|min_length[3]|max_length[100]|is_unique[users.username]',
+            'password' => 'required|string|min_length[6]',
+            'role'     => 'required|in_list[admin,editor,viewer]',
+        ];
+
+        if (! $this->validate($rules)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('errors', $this->validator->getErrors());
+        }
+
+        /** @var UserModel $userModel */
+        $userModel = model(UserModel::class);
+
+        $userModel->insert([
+            'username' => $this->request->getPost('username'),
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'role'     => $this->request->getPost('role'),
+        ]);
+
+        return redirect()->to('/admin/users')->with('success', 'เพิ่มผู้ใช้สำเร็จ');
+    }
 }
+

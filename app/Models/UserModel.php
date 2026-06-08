@@ -16,10 +16,12 @@ class UserModel extends Model
     protected $allowedFields = [
         'username',
         'password',
+        'role',
     ];
 
     protected $validationRules = [
         'username' => 'required|string|min_length[3]|max_length[100]|is_unique[users.username]',
         'password' => 'required|string|min_length[6]',
+        'role'     => 'permit_empty|in_list[admin,editor,viewer]',
     ];
 }

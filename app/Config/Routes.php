@@ -25,4 +25,9 @@ $routes->group('admin', ['filter' => 'auth'], static function ($routes) {
     $routes->get('edit/(:num)', 'Admin::edit/$1');
     $routes->post('save', 'Admin::save');
     $routes->post('delete/(:num)', 'Admin::delete/$1');
+
+    // User management (admin only — permission checked in controller)
+    $routes->get('users', 'Admin::users');
+    $routes->get('users/create', 'Admin::createUser');
+    $routes->post('users/save', 'Admin::saveUser');
 });
